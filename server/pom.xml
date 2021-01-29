@@ -21,10 +21,26 @@
   </properties>
 
   <dependencies>
+    <!-- spring -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
+
+    <!-- checkerframework annotation -->
+    <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.annotation</artifactId>
+      <version>2.2.600</version>
+    </dependency>
+
+    <!-- utils -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+
+    <!-- ui -->
     <dependency>
       <groupId>com.example</groupId>
       <artifactId>spring-angular-helloworld-ui</artifactId>
@@ -40,4 +56,67 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>checkerframework</id>
+      <properties>
+        <org.checkerframework.version>3.9.1</org.checkerframework.version>
+        <com.google.errorprone.version>9+181-r4173-1</com.google.errorprone.version>
+        <errorProneJavac>${com.google.errorprone:javac:jar}</errorProneJavac>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.checkerframework</groupId>
+          <artifactId>checker</artifactId>
+          <version>${org.checkerframework.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>com.google.errorprone</groupId>
+          <artifactId>javac</artifactId>
+          <version>${com.google.errorprone.version}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>properties</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <fork>true</fork>
+              <compilerArguments>
+                <Xmaxerrs>10000</Xmaxerrs>
+                <Xmaxwarns>10000</Xmaxwarns>
+              </compilerArguments>
+              <annotationProcessorPaths>
+                <path>
+                  <groupId>org.checkerframework</groupId>
+                  <artifactId>checker</artifactId>
+                  <version>${org.checkerframework.version}</version>
+                </path>
+              </annotationProcessorPaths>
+              <annotationProcessors>
+                <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
+                <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
+              </annotationProcessors>
+              <compilerArgs>
+                <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
+                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${com.google.errorprone.version}/javac-${com.google.errorprone.version}.jar</arg>
+              </compilerArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
